@@ -1,0 +1,36 @@
+.index{
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    .adv{
+        text-align: end;
+    }
+    .img{
+        width: 100vw;
+        height: 100vw;
+        background: url('../../assets/chess.png') no-repeat;
+        background-size: cover;
+        .chess{
+            padding: 5vw;
+            .line{
+                display: inline-block;
+                margin-bottom: 17.8vw;
+                .cell{
+                    display: inline-block;
+                    width: 60rpx;
+                    height: 60rpx;
+                    border-radius: 50%;
+                    border: 1rpx solid transparent;
+                    margin-right: 18.7vw;
+                    &:nth-last-child(1){
+                        margin-right: 0;
+                    }
+                }
+            }
+        }
+    }
+    .mi{
+        
+    }
+}
