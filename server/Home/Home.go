@@ -16,6 +16,7 @@ type Home struct {
 	UserA string `json:"userA"`
 	UserB string `json:"userB"`
 	Now   string `json:"now"`
+	End   bool   `json:"end"`
 	// 消息传递通道
 	Ch chan string `json:"-"`
 	// 房间超时 <-chan 表示只能接收值

@@ -56,6 +56,7 @@ func (hm *HomeManager) AddHome(userA string) *Home {
 		Id:    strconv.FormatInt(time.Now().UnixNano()/1e6, 10),
 		UserA: userA,
 		Now: userA,
+		End: false,
 		Chess: NewChess(),
 		Ch: make(chan string,1),
 		TimeoutChan: afterTime(time.Second * 60 * 60),

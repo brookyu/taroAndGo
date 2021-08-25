@@ -76,12 +76,20 @@ func joinHome(c *gin.Context){
 	id := c.Query("id")
 	user := c.Query("user")
 	h := hm.GetHome(id)
-	h = h.JoinHome(user)
-	c.JSON(http.StatusOK,Home.Response{
-		Status: http.StatusOK,
-		Msg:    "加入房间成功",
-		Data:   h,
-	})
+	if h != nil{
+		h = h.JoinHome(user)
+		c.JSON(http.StatusOK,Home.Response{
+			Status: http.StatusOK,
+			Msg:    "加入房间成功",
+			Data:   h,
+		})
+	}else {
+		c.JSON(http.StatusOK,Home.Response{
+			Status: http.StatusBadRequest,
+			Msg:    "你输入的房间不存在或已销毁",
+			Data:   h,
+		})
+	}
 }
 
 // 进入房间
