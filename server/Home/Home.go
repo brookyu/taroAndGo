@@ -24,7 +24,7 @@ type Home struct {
 	Stopped chan bool `json:"-"`
 	// 需要有序的访问Now参数
 	ChNow chan bool `json:"-"`
-	Chess *chess
+	Chess *chess    `json:"chess"`
 }
 
 // 判断是不是当前用户在置棋
@@ -61,5 +61,5 @@ func (h *Home)PutPiece(hd Handle,movP,advP int) (bool,error) {
 	h.Chess.clear(movP,advP,hd.EndX,hd.EndY)
 
 	// 3. 判断输赢
-	return h.Chess.judge(advP), nil
+	return h.Chess.Judge(advP), nil
 }

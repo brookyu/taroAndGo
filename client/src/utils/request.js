@@ -1,6 +1,7 @@
 /**
  * 请求方法封装
 */
+import {ipaddr} from '../config'
 import Taro from '@tarojs/taro'
 
 /**
@@ -19,7 +20,7 @@ export default async function fetch(options) {
         url
     } = options
 
-    url = url.replace(/^\/v1/, 'http://localhost:2303')
+    url = url.replace(/^\/v1/, 'https://'+ipaddr)
 
     const slp = async x =>{
         return new Promise(r=>{

@@ -12,7 +12,7 @@ import (
 
 // 棋子
 type chess struct {
-	Pieces [4][4]int
+	Pieces [4][4]int `json:"pieces"`
 }
 
 // 移动棋子
@@ -88,7 +88,7 @@ func (c *chess)clear(movP, advP, endX, endY int)  {
 }
 
 // 判断输赢
-func (c *chess)judge(advP int) bool {
+func (c *chess)Judge(advP int) bool {
 	ans := 0
 	for i:=0;i<4;i++{
 		for j:=0;j<4;j++{
@@ -104,10 +104,10 @@ func (c *chess)judge(advP int) bool {
 func NewChess() *chess {
 	return &chess{
 		Pieces: [4][4]int{
-			{1,1,1,1},
-			{1,0,0,1},
-			{2,0,0,2},
 			{2,2,2,2},
+			{2,0,0,2},
+			{1,0,0,1},
+			{1,1,1,1},
 		},
 	}
 }

@@ -1,17 +1,47 @@
 import { View,Image,Button } from '@tarojs/components'
 import { AtButton, AtModal, AtModalHeader, AtModalContent, AtModalAction } from "taro-ui"
-import Taro from '@tarojs/taro'
+import Taro, { useDidShow } from '@tarojs/taro'
 import fetch from '../../utils/request'
 import styles from './index.module.less'
-import { useState } from 'react'
-const index = () => {
+import { useState,useEffect } from 'react'
+import dva from '../../utils/dva'
+
+const slp = async x => new Promise(r=>setTimeout(r,x))
+let store = dva.getStore()
+let { user } = store.getState()
+let { name } = user || {}
+
+
+const Index = () => {
+  
+  useDidShow(()=>{
+    store = dva.getStore()
+    user = store.getState().user
+    name = user && user.name
+  })
+
+  // 获取当前用户状态
+  useDidShow(async()=>{
+    let res = await fetch({url:'/v1/state',method:"get",data:{user:name}})
+    if (res instanceof Error)return 
+    const {home,state} = res
+    if (state != 'init'){
+      Taro.showToast({title:'您有正在进行的游戏',icon:'none'})
+      await slp(2000) 
+      Taro.switchTab({url:'/pages/myHome/index'})
+    }
+  })
+
+  
+  
+    
 
   const [open,setOpen] = useState(false)
   const [home,setHome] = useState()
 
   // 创建游戏房间
   const createHome = async() =>{
-    let res = await fetch({url:'/v1/create',method:'get',data:{user:'yuan'}})
+    let res = await fetch({url:'/v1/create',method:'get',data:{user:name}})
     if (res instanceof Error)return 
     setHome(res)
     setOpen(true)
@@ -22,11 +52,12 @@ const index = () => {
   const setClip = async () =>{
     if (!home) return 
     const {id,userA} = home
-    const res = await Taro.setClipboardData({
+    await Taro.setClipboardData({
       data: '搜索小程序"6"，输入房间号['+id+']即可加入游戏房间，您的好友['+userA+']正在等您',
     })
-    console.log(res)
     setOpen(false)
+    await slp(2000)
+    Taro.switchTab({url:'/pages/myHome/index'})
   }
 
   return (
@@ -77,4 +108,4 @@ const index = () => {
   )
 }
 
-export default index
+export default Index

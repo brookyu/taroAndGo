@@ -2,9 +2,9 @@
   "miniprogramRoot": "dist/",
   "projectname": "6",
   "description": "六子棋",
-  "appid": "wx6fc1463a3f114b47",
+  "appid": "wxf1482ad7dedb3944",
   "setting": {
-    "urlCheck": false,
+    "urlCheck": true,
     "es6": false,
     "enhance": true,
     "postcss": false,
@@ -36,9 +36,10 @@
     "packNpmManually": false,
     "packNpmRelationList": [],
     "minifyWXSS": true,
+    "useStaticServer": false,
     "showES6CompileOption": false
   },
-  "compileType": "miniprogram",
+  "compileType": "game",
   "simulatorType": "wechat",
   "simulatorPluginLibVersion": {},
   "condition": {}

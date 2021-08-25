@@ -1,16 +1,35 @@
-.index{
+page{
     height: 100vh;
+}
+.index{
+    height: 100%;
     display: flex;
     flex-direction: column;
     justify-content: center;
+    .now{
+        width: 100%;
+        text-align: center;
+        margin: 10rpx 0 20rpx 0;
+        .homeId{
+            font-size: 20rpx;
+        }
+    }
     .adv{
-        text-align: end;
+       display: flex;
+       flex-direction: row-reverse;
+       align-items: center;
+       margin-right: 20rpx;
+       .piece{
+            margin-right: 30rpx;
+        }
     }
     .img{
         width: 100vw;
         height: 100vw;
         background: url('../../assets/chess.png') no-repeat;
         background-size: cover;
+        margin: 30rpx 0;
+        position: relative;
         .chess{
             padding: 5vw;
             .line{
@@ -29,8 +48,36 @@
                 }
             }
         }
+        .closeHome{
+            position: absolute;
+            bottom: -30rpx;
+            right: 20rpx;
+            font-size: 20rpx;
+            cursor: pointer;
+            color: blue;
+        }
     }
     .mi{
-        
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        margin-left: 20rpx;
+        .piece{
+            margin-left: 30rpx;
+        }
+    }
+    // 用于mi 和adv中棋子样例
+    .piece{
+        display: inline-block;
+        width: 60rpx;
+        height: 60rpx;
+        border-radius: 50%;
+    }
+    .modal{
+        height: 180rpx;
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+        justify-content: space-around;
     }
 }
