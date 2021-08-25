@@ -12,10 +12,10 @@ export default {
     // generator  这里的方法第二个参数都是{call, put }, call调用异步方法, put 可以调用reducers中的方法
     * saveStorageSync({payload, cb }, {call, put }) {
       for (let index = 0; index <  Object.keys(payload).length; index++) {
-        yield call(Taro.setStorage, {
-          key: Object.keys(payload)[index],
-          data: payload[Object.keys(payload)[index]]
-        });
+        yield call(Taro.setStorageSync, 
+          Object.keys(payload)[index],
+          payload[Object.keys(payload)[index]]
+        );
       }
       cb && cb();
       yield put({
@@ -28,9 +28,11 @@ export default {
   reducers: { // 同步方法
     // state是状态信息，pyload是函数参数
     save(state, {payload }) {
-      console.log(state)
-      console.log(payload)
       return {...state, ...payload };
+    },
+    zry(state) {
+      console.log('zry reduce')
+      return {...state };
     },
   },
 };

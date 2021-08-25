@@ -27,13 +27,19 @@ const Index = () => {
   // 用户当前选中的位置
   const [position,setPosition] = useState([-1,-1])
 
-  // modal的刷新也会影响
   useDidShow(()=>{
+    
     (async()=>{
       // 0. 获取变量信息
       const store = dva.getStore()
       const { user } = store.getState()
       const {name} = user||{}
+      if (!name){
+        Taro.showToast({title:'您还未创建游戏',icon:'none'})
+        await slp(2000)
+        Taro.switchTab({url:'/pages/createHome/index'})
+        return
+      }
 
       // 1. 获取当前用户的状态
       let res = await fetch({url:'/v1/state',method:'get',data:{user:name}})
@@ -103,7 +109,6 @@ const Index = () => {
     })
     ws.onClose(e=>{
       console.log('ws 关闭',e)
-      setWin(false)
     })
   }
 
@@ -225,6 +230,7 @@ const Index = () => {
         </AtModalContent>
         <AtModalAction> 
           <Button onClick={()=>{
+            setWin(false)
             Taro.switchTab({url:'/pages/createHome/index'})
           }} 
           >确定</Button> 

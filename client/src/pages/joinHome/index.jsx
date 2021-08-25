@@ -6,6 +6,7 @@ import fetch from '../../utils/request'
 import Taro, {useDidShow} from '@tarojs/taro'
 import {useState} from 'react'
 import dva from '../../utils/dva'
+import login from '../../utils/login'
 
 const slp = async x => new Promise(r => setTimeout(r, x))
 
@@ -16,22 +17,24 @@ const Index = () => {
 
     // 查看当前用户状态
     useDidShow(async () => {
-      const store = dva.getStore()
-      const {user} = store.getState()
-      const {name} = user || {}
-        const res = await fetch({
-            url: '/v1/state',
-            method: 'get',
-            data: {
-                user: name
+        const store = dva.getStore()
+        const {user} = store.getState()
+        const {name} = user || {}
+        if (name){
+            const res = await fetch({
+                url: '/v1/state',
+                method: 'get',
+                data: {
+                    user: name
+                }
+            })
+            if (res instanceof Error)return
+            const {state}= res
+            if (state!='init'){
+              Taro.showToast({title:'您有正在进行的游戏',icon:"none"})
+              await slp(2000)
+              Taro.switchTab({url:'/pages/myHome/index'})
             }
-        })
-        if (res instanceof Error)return
-        const {state}= res
-        if (state!='init'){
-          Taro.showToast({title:'您有正在进行的游戏',icon:"none"})
-          await slp(2000)
-          Taro.switchTab({url:'/pages/myHome/index'})
         }
     })
 
@@ -48,21 +51,26 @@ const Index = () => {
     })
 
     const joinHome = async () => {
-      const store = dva.getStore()
-      const {user} = store.getState()
-      const {name} = user || {}
-        let res = await fetch({
-            url: '/v1/join',
-            method: 'get',
-            data: {
-                id,
-                user: name
-            }
-        })
-        if (res instanceof Error) 
-            return
-           
-        Taro.switchTab({url: '/pages/myHome/index'})
+        const store = dva.getStore()
+        const {user} = store.getState()
+        const {name} = user || {}
+        if (!name){
+            login()
+        }else{
+            let res = await fetch({
+                url: '/v1/join',
+                method: 'get',
+                data: {
+                    id,
+                    user: name
+                }
+            })
+            if (res instanceof Error) 
+                return
+               
+            Taro.switchTab({url: '/pages/myHome/index'})
+        }
+        
     }
 
     return (

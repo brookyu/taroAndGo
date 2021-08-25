@@ -4,7 +4,7 @@
   "description": "六子棋",
   "appid": "wxf1482ad7dedb3944",
   "setting": {
-    "urlCheck": true,
+    "urlCheck": false,
     "es6": false,
     "enhance": true,
     "postcss": false,
@@ -36,7 +36,6 @@
     "packNpmManually": false,
     "packNpmRelationList": [],
     "minifyWXSS": true,
-    "useStaticServer": false,
     "showES6CompileOption": false
   },
   "compileType": "game",

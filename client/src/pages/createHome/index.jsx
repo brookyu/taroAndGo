@@ -4,48 +4,49 @@ import Taro, { useDidShow } from '@tarojs/taro'
 import fetch from '../../utils/request'
 import styles from './index.module.less'
 import { useState,useEffect } from 'react'
+import login from '../../utils/login'
 import dva from '../../utils/dva'
 
 const slp = async x => new Promise(r=>setTimeout(r,x))
-let store = dva.getStore()
-let { user } = store.getState()
-let { name } = user || {}
-
 
 const Index = () => {
-  
-  useDidShow(()=>{
-    store = dva.getStore()
-    user = store.getState().user
-    name = user && user.name
-  })
 
   // 获取当前用户状态
   useDidShow(async()=>{
-    let res = await fetch({url:'/v1/state',method:"get",data:{user:name}})
-    if (res instanceof Error)return 
-    const {home,state} = res
-    if (state != 'init'){
-      Taro.showToast({title:'您有正在进行的游戏',icon:'none'})
-      await slp(2000) 
-      Taro.switchTab({url:'/pages/myHome/index'})
+    let store = dva.getStore()
+    let { user } = store.getState()
+    let { name } = user || {}
+
+    if (name){
+      let res = await fetch({url:'/v1/state',method:"get",data:{user:name}})
+      if (res instanceof Error)return 
+      const {home,state} = res
+      if (state != 'init'){
+        Taro.showToast({title:'您有正在进行的游戏',icon:'none'})
+        await slp(2000) 
+        Taro.switchTab({url:'/pages/myHome/index'})
+      }
     }
   })
-
-  
-  
-    
 
   const [open,setOpen] = useState(false)
   const [home,setHome] = useState()
 
   // 创建游戏房间
   const createHome = async() =>{
-    let res = await fetch({url:'/v1/create',method:'get',data:{user:name}})
-    if (res instanceof Error)return 
-    setHome(res)
-    setOpen(true)
-    
+    let store = dva.getStore()
+    let { user } = store.getState()
+    let { name } = user || {}
+
+    if (!name) {
+      login()
+      return 
+    }else{
+      let res = await fetch({url:'/v1/create',method:'get',data:{user:name}})
+      if (res instanceof Error)return 
+      setHome(res)
+      setOpen(true)
+    }
   }
 
   // 复制房间号
@@ -53,7 +54,7 @@ const Index = () => {
     if (!home) return 
     const {id,userA} = home
     await Taro.setClipboardData({
-      data: '搜索小程序"6"，输入房间号['+id+']即可加入游戏房间，您的好友['+userA+']正在等您',
+      data: '搜索小程序"梓琪流 两颗打一颗"，输入房间号['+id+']即可加入游戏房间，您的好友['+userA+']正在等您',
     })
     setOpen(false)
     await slp(2000)
