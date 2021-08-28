@@ -1,13 +1,13 @@
 import { View, Button } from '@tarojs/components'
 import { useEffect, useState } from 'react'
-import Taro, { useDidHide, useDidShow } from '@tarojs/taro'
+import Taro, { useDidHide, useDidShow, usePullDownRefresh, useShareAppMessage, useShareTimeline } from '@tarojs/taro'
 import { AtModal, AtModalHeader, AtModalContent, AtModalAction } from "taro-ui"
 import dva from '../../utils/dva'
 import chessImg from '../../assets/chess.png'
 import styles from './index.module.less'
 import fetch from '../../utils/request'
 import getWs from '../../utils/websocket' 
-import { window } from '@tarojs/runtime'
+import {appName, getShareImage} from '../../config/index'
 
 const slp = async x => new Promise(r=>setTimeout(r,x))
 const colors = ["transparent","#444693","#ffd400"]
@@ -16,6 +16,24 @@ const colors = ["transparent","#444693","#ffd400"]
 let ws 
 
 const Index = () => {
+
+  // 转发
+  useShareAppMessage(res=>{
+    if (res.from === 'button') {
+      // 来自页面内转发按钮
+      console.log(res.target)
+    }
+    return {
+      title: `${appName} 致敬曾经逝去的青春和年华！！！`,
+      path: '/pages/createHome/index',
+      imageUrl: getShareImage()
+    }
+  })
+
+  // 朋友圈
+  useShareTimeline(()=>{
+    console.log('onShareTimeline')
+  })
 
   const [chess, setChess] = useState([
     [0,0,0,0],
@@ -27,39 +45,48 @@ const Index = () => {
   // 用户当前选中的位置
   const [position,setPosition] = useState([-1,-1])
 
+  const initHome = async(first)=>{
+    // 0. 获取变量信息
+    const store = dva.getStore()
+    const { user } = store.getState()
+    const {name} = user||{}
+    if (!name){
+      Taro.showToast({title:'您还未创建游戏',icon:'none'})
+      await slp(2000)
+      Taro.switchTab({url:'/pages/createHome/index'})
+      return
+    }
+
+    // 1. 获取当前用户的状态
+    let res = await fetch({url:'/v1/state',method:'get',data:{user:name}})
+    if (res instanceof Error)return 
+    const {state, home} = res
+    setHome(home)
+
+    // 2. 根据用户当前状态的不同，进行不同的显示
+    if (state == 'init'){
+      Taro.showToast({title:'您还未创建游戏',icon:'none'})
+      await slp(2000)
+      Taro.switchTab({url:'/pages/createHome/index'})
+      return
+    }else if(state == 'one'){
+      if(first)Taro.showToast({title:'请将您的房间号分享给你的好友',icon:'none'})
+    }
+    // 当前正在游戏中，建立ws链接。 若当前只有一个用户也没关系，在另一个用户加入到房间中后，本用户（建房间）能够收到置棋操作。
+    ws = await getWs({url:`/v1/visit?user=${name}&id=${home.id}`})
+    handleWs()
+  }
+
+  // 进入房间初始化
   useDidShow(()=>{
-    
-    (async()=>{
-      // 0. 获取变量信息
-      const store = dva.getStore()
-      const { user } = store.getState()
-      const {name} = user||{}
-      if (!name){
-        Taro.showToast({title:'您还未创建游戏',icon:'none'})
-        await slp(2000)
-        Taro.switchTab({url:'/pages/createHome/index'})
-        return
-      }
+    initHome(true)
+  })
 
-      // 1. 获取当前用户的状态
-      let res = await fetch({url:'/v1/state',method:'get',data:{user:name}})
-      if (res instanceof Error)return 
-      const {state, home} = res
-      setHome(home)
-
-      // 2. 根据用户当前状态的不同，进行不同的显示
-      if (state == 'init'){
-        Taro.showToast({title:'您还未创建游戏',icon:'none'})
-        await slp(2000)
-        Taro.switchTab({url:'/pages/createHome/index'})
-        return
-      }else if(state == 'one'){
-        Taro.showToast({title:'请将您的房间号分享给你的好友',icon:'none'})
-      }
-      // 当前正在游戏中，建立ws链接。 若当前只有一个用户也没关系，在另一个用户加入到房间中后，本用户（建房间）能够收到置棋操作。
-      ws = await getWs({url:`/v1/visit?user=${name}&id=${home.id}`})
-      handleWs()
-    })()
+  // 下拉刷新
+  usePullDownRefresh(async()=>{
+    if (ws)ws.close()
+    await initHome()
+    Taro.stopPullDownRefresh()
   })
   
   useDidHide(()=>{

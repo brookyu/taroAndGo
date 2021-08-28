@@ -1,15 +1,34 @@
 import { View,Image,Button } from '@tarojs/components'
 import { AtButton, AtModal, AtModalHeader, AtModalContent, AtModalAction } from "taro-ui"
-import Taro, { useDidShow } from '@tarojs/taro'
+import Taro, { useDidShow, useShareAppMessage, useShareTimeline } from '@tarojs/taro'
 import fetch from '../../utils/request'
 import styles from './index.module.less'
-import { useState,useEffect } from 'react'
+import { useState } from 'react'
 import login from '../../utils/login'
 import dva from '../../utils/dva'
+import {appName,shareImages,getShareImage} from '../../config/index'
 
 const slp = async x => new Promise(r=>setTimeout(r,x))
 
 const Index = () => {
+  
+  // 转发
+  useShareAppMessage(res=>{
+    if (res.from === 'button') {
+      // 来自页面内转发按钮
+      console.log(res.target)
+    }
+    return {
+      title: `${appName} 致敬曾经逝去的青春和年华！！！`,
+      path: '/pages/createHome/index',
+      imageUrl: getShareImage()
+    }
+  })
+
+  // 朋友圈
+  useShareTimeline(()=>{
+    console.log('onShareTimeline')
+  })
 
   // 获取当前用户状态
   useDidShow(async()=>{
@@ -17,6 +36,7 @@ const Index = () => {
     let { user } = store.getState()
     let { name } = user || {}
 
+    
     if (name){
       let res = await fetch({url:'/v1/state',method:"get",data:{user:name}})
       if (res instanceof Error)return 
@@ -54,10 +74,9 @@ const Index = () => {
     if (!home) return 
     const {id,userA} = home
     await Taro.setClipboardData({
-      data: '搜索小程序"梓琪流 两颗打一颗"，输入房间号['+id+']即可加入游戏房间，您的好友['+userA+']正在等您',
+      data: `搜索小程序"${appName}，输入房间号[`+id+']即可加入游戏房间，您的好友['+userA+']正在等您',
     })
     setOpen(false)
-    await slp(2000)
     Taro.switchTab({url:'/pages/myHome/index'})
   }
 

@@ -17,7 +17,7 @@ import dva from './dva'
             dispatch({
                 type: "user/saveStorageSync",
                 payload: {
-                    name: res.userInfo.nickName,
+                    name: res.userInfo.nickName.replace(' ','_'),
                     avatar: res.userInfo.avatarUrl
                 }
             })

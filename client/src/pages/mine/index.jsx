@@ -3,10 +3,29 @@ import { AtIcon } from 'taro-ui'
 import styles from './index.module.less'
 import dva from '../../utils/dva'
 import login from '../../utils/login'
-import { useDidShow } from '@tarojs/taro'
+import {useDidShow, useShareAppMessage, useShareTimeline} from '@tarojs/taro'
 import { useState } from 'react'
+import {appName, getShareImage} from '../../config/index'
 
 const Index = () => {
+
+   // 转发
+   useShareAppMessage(res=>{
+    if (res.from === 'button') {
+      // 来自页面内转发按钮
+      console.log(res.target)
+    }
+    return {
+      title: `${appName} 致敬曾经逝去的青春和年华！！！`,
+      path: '/pages/createHome/index',
+      imageUrl: getShareImage()
+    }
+  })
+
+  // 朋友圈
+  useShareTimeline(()=>{
+    console.log('onShareTimeline')
+  })
 
   const [user,setUser] = useState({})
 

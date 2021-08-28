@@ -3,14 +3,51 @@ import joinHomeBg from '../../assets/joinHome.png'
 import {AtInput, AtForm, AtButton} from 'taro-ui'
 import styles from './index.module.less'
 import fetch from '../../utils/request'
-import Taro, {useDidShow} from '@tarojs/taro'
+import Taro, {useDidShow, useShareAppMessage, useShareTimeline} from '@tarojs/taro'
 import {useState} from 'react'
+import {appName, getShareImage} from '../../config/index'
 import dva from '../../utils/dva'
 import login from '../../utils/login'
 
 const slp = async x => new Promise(r => setTimeout(r, x))
 
 const Index = () => {
+
+    // 转发
+  useShareAppMessage(res=>{
+    if (res.from === 'button') {
+      // 来自页面内转发按钮
+      console.log(res.target)
+    }
+    return {
+      title: `${appName} 致敬曾经逝去的青春和年华！！！`,
+      path: '/pages/createHome/index',
+      imageUrl: getShareImage()
+    }
+  })
+
+  // 朋友圈
+  useShareTimeline(()=>{
+    console.log('onShareTimeline')
+  })
+
+  // 获取当前用户状态
+  useDidShow(async()=>{
+    let store = dva.getStore()
+    let { user } = store.getState()
+    let { name } = user || {}
+
+    if (name){
+      let res = await fetch({url:'/v1/state',method:"get",data:{user:name}})
+      if (res instanceof Error)return 
+      const {home,state} = res
+      if (state != 'init'){
+        Taro.showToast({title:'您有正在进行的游戏',icon:'none'})
+        await slp(2000) 
+        Taro.switchTab({url:'/pages/myHome/index'})
+      }
+    }
+  })
 
     // 用户想加入的房间号
     const [id, setId] = useState()

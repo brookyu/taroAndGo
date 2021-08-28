@@ -77,6 +77,14 @@ func joinHome(c *gin.Context){
 	user := c.Query("user")
 	h := hm.GetHome(id)
 	if h != nil{
+		if h.UserB == user || h.UserA == user{
+			c.JSON(http.StatusOK,Home.Response{
+				Status: http.StatusBadRequest,
+				Msg:    "您已经在房间中了",
+				Data:   h,
+			})
+			return
+		}
 		h = h.JoinHome(user)
 		c.JSON(http.StatusOK,Home.Response{
 			Status: http.StatusOK,
