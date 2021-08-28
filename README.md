@@ -8,8 +8,7 @@
 
 + 该项目后端采用`Gin`作为主要的技术框架，未使用数据库。
 
-![](https://zhangruiyuan.oss-cn-hangzhou.aliyuncs.com/picGo/images/20210828173702.png)
-
+![](https://zhangruiyuan.oss-cn-hangzhou.aliyuncs.com/picGo/images/20210828220207.png)
 
 
 # 二、项目功能
