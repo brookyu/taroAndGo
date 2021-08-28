@@ -7,6 +7,7 @@ import chessImg from '../../assets/chess.png'
 import styles from './index.module.less'
 import fetch from '../../utils/request'
 import getWs from '../../utils/websocket' 
+import login from '../../utils/login'
 import {appName, getShareImage} from '../../config/index'
 
 const slp = async x => new Promise(r=>setTimeout(r,x))
@@ -24,8 +25,8 @@ const Index = () => {
       console.log(res.target)
     }
     return {
-      title: `${appName} 致敬曾经逝去的青春和年华！！！`,
-      path: '/pages/createHome/index',
+      title: `${appName} 点击链接加入游戏！！！`,
+      path: '/pages/myHome/index?id='+home.id,
       imageUrl: getShareImage()
     }
   })
@@ -33,6 +34,11 @@ const Index = () => {
   // 朋友圈
   useShareTimeline(()=>{
     console.log('onShareTimeline')
+    return {
+      title: `${appName} 点击链接加入游戏！！！`,
+      path: '/pages/myHome/index?id='+home.id,
+      imageUrl: getShareImage()
+    }
   })
 
   const [chess, setChess] = useState([
@@ -42,14 +48,20 @@ const Index = () => {
     [0,0,0,0],
   ])
   const [home,setHome] = useState()
-  // 用户当前选中的位置
   const [position,setPosition] = useState([-1,-1])
+  const [win,setWin] = useState(false)
+  const [join, setJoin] = useState(false)
+  const [share,setShare] = useState(false)
 
-  const initHome = async(first)=>{
+  // 初始化房间的信息 操作函数
+  const initHome = async({first, name})=>{
     // 0. 获取变量信息
-    const store = dva.getStore()
-    const { user } = store.getState()
-    const {name} = user||{}
+    if (!name){
+      const store = dva.getStore()
+      const { user } = store.getState()
+      name = user.name 
+    }
+
     if (!name){
       Taro.showToast({title:'您还未创建游戏',icon:'none'})
       await slp(2000)
@@ -70,33 +82,53 @@ const Index = () => {
       Taro.switchTab({url:'/pages/createHome/index'})
       return
     }else if(state == 'one'){
-      if(first)Taro.showToast({title:'请将您的房间号分享给你的好友',icon:'none'})
+      // if(first)Taro.showToast({title:'请分享本界面给你的好友',icon:'none'})
+      setShare(true)
     }
     // 当前正在游戏中，建立ws链接。 若当前只有一个用户也没关系，在另一个用户加入到房间中后，本用户（建房间）能够收到置棋操作。
     ws = await getWs({url:`/v1/visit?user=${name}&id=${home.id}`})
     handleWs()
   }
 
+  // 加入到房间中，但是不会进行提醒
+  const joinHome = async ({id,name}) =>{
+    const res = await fetch({url:`/v1/join?id=${id}&user=${name}`,method:'get',showToast:false})
+    if (res instanceof Error)return 
+  }
+
   // 进入房间初始化
   useDidShow(()=>{
-    initHome(true)
+    // 判断用户是否已经加入了房间
+    let { id } = Taro.getCurrentInstance().router.params
+    if (id){
+      const store = dva.getStore()
+      const { user } = store.getState()
+      const {name} = user||{}
+      if (!name){
+        // 准备获取权限信息
+        setJoin(true)
+        return
+      }else{
+        joinHome({id,name})
+      }  
+    }
+    initHome({first:true})
   })
 
   // 下拉刷新
   usePullDownRefresh(async()=>{
     if (ws)ws.close()
-    await initHome()
+    await initHome({})
     Taro.stopPullDownRefresh()
   })
   
+  // 隐藏
   useDidHide(()=>{
     if (ws){
       ws.close()
     }
   })
   
-
-  const [win,setWin] = useState(false)
 
   // 游戏房间长链接
   const handleWs = () =>{
@@ -118,6 +150,7 @@ const Index = () => {
       console.log({status,msg,data})
 
       if (data){
+        if (data.userB)setShare(false)
         setHome(data)
         setChess(data.chess.pieces)
         setPosition([-1,-1])
@@ -206,13 +239,11 @@ const Index = () => {
     Taro.switchTab({url:'/pages/createHome/index'})
   }
 
-  const store = dva.getStore()
-  const { user } = store.getState()
-  const {name} = user||{}
+
   return (
     <View className={styles.index}>
       <View className={styles.now}>
-        <View>当前置棋方：【{(home&&home.now)||name}】</View>
+        <View>当前置棋方：【{home&&home.now||'-'}】</View>
         <View className={styles.homeId}>{home&&home.id}</View>
       </View>
       <View className={styles.adv}>
@@ -248,6 +279,20 @@ const Index = () => {
         玩家一：{home&&home.userA}
         <View className={styles.piece} style={{ backgroundColor:colors[1]}}></View>
       </View>
+      <AtModal isOpened={share} closeOnClickOverlay={false} >
+        <AtModalHeader>分享游戏</AtModalHeader>
+        <AtModalContent>
+          <View className={styles.modal}>
+            <View>请您点击右上角分享按钮</View>
+            <View>或者是下方的分享按钮</View>
+            <View>分享房间给好友</View>
+          </View>
+        </AtModalContent>
+        <AtModalAction> 
+          <Button onClick={closeHome} >销毁房间</Button> 
+          <Button openType='share'>分享房间</Button> 
+          </AtModalAction>
+      </AtModal>
       <AtModal isOpened={win}>
         <AtModalHeader>游戏结束</AtModalHeader>
         <AtModalContent>
@@ -259,6 +304,26 @@ const Index = () => {
           <Button onClick={()=>{
             setWin(false)
             Taro.switchTab({url:'/pages/createHome/index'})
+          }} 
+          >确定</Button> 
+          </AtModalAction>
+      </AtModal>
+      <AtModal isOpened={join}>
+        <AtModalHeader>加入游戏</AtModalHeader>
+        <AtModalContent>
+          <View className={styles.modal}>
+            <View>加入房间需要获取您的微信名和头像信息</View>
+          </View>
+        </AtModalContent>
+        <AtModalAction> 
+          <Button onClick={async()=>{
+            let res = await login()
+            if (res instanceof Error)return 
+            const {name} = res
+            let { id } = Taro.getCurrentInstance().router.params
+            joinHome({id,name})
+            setJoin(false)
+            initHome({first:true,name})
           }} 
           >确定</Button> 
           </AtModalAction>

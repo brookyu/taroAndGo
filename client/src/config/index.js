@@ -1,9 +1,9 @@
 
-const ipaddr = 'localhost:2303'
-// const ipaddr = 'gflmini.zju-zry.club/ziqi.six'
+// const ipaddr = 'localhost:2303'
+const ipaddr = 'gflmini.zju-zry.club/ziqi.six'
 
-const httpIpaddr = 'http://'+ipaddr
-const wsIpaddr = 'ws://'+ipaddr
+const httpIpaddr = 'https://'+ipaddr
+const wsIpaddr = 'wss://'+ipaddr
 
 const appName = '梓琪流 两颗打一颗'
 

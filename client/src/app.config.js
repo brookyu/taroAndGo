@@ -2,7 +2,6 @@ export default {
   pages: [
     'pages/index/index',
     'pages/createHome/index',
-    'pages/joinHome/index',
     'pages/mine/index',
     'pages/myHome/index',
   ],
@@ -22,12 +21,6 @@ export default {
         text: '创建游戏',
         iconPath: 'assets/create.png',
         selectedIconPath: 'assets/create_blue.png',
-      },
-      {
-        pagePath: 'pages/joinHome/index',
-        text: '加入房间',
-        iconPath: 'assets/join.png',
-        selectedIconPath: 'assets/join_blue.png',
       },
       {
         pagePath: 'pages/myHome/index',

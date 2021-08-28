@@ -25,6 +25,11 @@ const Index = () => {
   // 朋友圈
   useShareTimeline(()=>{
     console.log('onShareTimeline')
+    return {
+      title: `${appName} 致敬曾经逝去的青春和年华！！！`,
+      path: '/pages/createHome/index',
+      imageUrl: getShareImage()
+    }
   })
 
   const [user,setUser] = useState({})

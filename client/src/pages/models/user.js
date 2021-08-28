@@ -32,7 +32,7 @@ export default {
     },
     zry(state) {
       console.log('zry reduce')
-      return {...state };
+      return {...state ,name:'zry'+Math.random()*10};
     },
   },
 };

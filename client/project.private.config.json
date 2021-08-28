@@ -45,7 +45,7 @@
         {
           "name": "pages/myHome/index",
           "pathName": "pages/myHome/index",
-          "query": "id=2",
+          "query": "",
           "scene": null
         }
       ]
