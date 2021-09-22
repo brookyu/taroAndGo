@@ -3,7 +3,7 @@ import { AtIcon } from 'taro-ui'
 import styles from './index.module.less'
 import dva from '../../utils/dva'
 import login from '../../utils/login'
-import {useDidShow, useShareAppMessage, useShareTimeline} from '@tarojs/taro'
+import Taro, {useDidShow, useShareAppMessage, useShareTimeline} from '@tarojs/taro'
 import { useState } from 'react'
 import {appName, getShareImage} from '../../config/index'
 
@@ -57,8 +57,8 @@ const Index = () => {
           </View>
         </View>
         <View className={styles.info}>
-          <View className={styles.line}>
-            <View className={styles.title}>
+          <View className={styles.line} onClick={()=>Taro.navigateTo({url:'/pages/feedback/index'})}>
+            <View className={styles.title} >
               <Image src={require('../../assets/fk.png')} mode='widthFix' ></Image>
               用户反馈
             </View>

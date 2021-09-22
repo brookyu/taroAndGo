@@ -4,6 +4,7 @@ export default {
     'pages/createHome/index',
     'pages/mine/index',
     'pages/myHome/index',
+    'pages/feedback/index',
   ],
   window: {
     backgroundTextStyle: 'light',

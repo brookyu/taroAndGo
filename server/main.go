@@ -7,6 +7,7 @@ package main
 
 import (
 	"6/Home"
+	"6/Utils"
 	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -231,6 +232,45 @@ func deleteHome(c *gin.Context)  {
 	}
 }
 
+// 接收反馈
+type FeedBack struct {
+	Question string `json:"question"`
+	Contract string `json:"contract"`
+}
+func feedback(c *gin.Context){
+	tmp := &FeedBack{}
+	if c.Bind(tmp) == nil{
+		mailTo := []string{"zhangruiyuan@zju.edu.cn"}
+		subject := "「用户反馈 - 六子棋小程序」"
+
+		if tmp.Question == ""{
+			c.JSON(http.StatusOK,Home.Response{
+				Status: http.StatusBadRequest,
+				Msg:    "请输入您的反馈内容",
+				Data:   nil,
+			})
+			return
+		}
+
+		body := tmp.Question + " " + tmp.Contract
+
+		err := Utils.SendMail(mailTo, subject, body)
+		if err != nil {
+			c.JSON(http.StatusOK,Home.Response{
+				Status: http.StatusBadRequest,
+				Msg:    "邮件发送失败",
+				Data:   nil,
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, "")
+	}else{
+		c.JSON(http.StatusBadRequest, "")
+	}
+}
+
+
 /**
 打包命令
 CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o server main.go
@@ -245,6 +285,9 @@ func main() {
 	r.GET("/join",joinHome)
 	r.GET("/visit", visitHome)
 	r.GET("/delete", deleteHome)
+	r.POST("/feedback", feedback)
 	_ = r.Run(bindAddress)
+
+
 
 }

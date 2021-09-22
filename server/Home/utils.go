@@ -13,4 +13,3 @@ import (
 func afterTime(t time.Duration) <-chan time.Time {
 	return time.After(t)
 }
-

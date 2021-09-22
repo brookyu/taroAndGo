@@ -77,7 +77,7 @@ const Index = () => {
           六子棋（两颗打一颗）游戏
         </View>
         <View className='at-article__info'>
-          2021-08-20&nbsp;&nbsp;&nbsp; https://github.com/zju-zry/
+          2021-08-20&nbsp;&nbsp;&nbsp; https://github.com/zju-zry/6
         </View>
         <View className='at-article__p'>
           六子棋的走法。六子棋是流传于中国民间的一类版图游戏。是一种双人对弈搏杀的一种游戏，交战双方棋子数均为六颗，故称六子棋。六子棋的棋盘为3乘以3的方格。棋子可信手拿来，只要互相区分即可。
@@ -105,7 +105,7 @@ const Index = () => {
       {/* <AtFab className={styles.create}>
         <Text className='at-fab__icon at-icon at-icon-add'></Text>
       </AtFab> */}
-      <AtButton type='primary' className={styles.btn} onClick={createHome}>创建游戏</AtButton>
+      <AtButton type='primary' className={styles.btn} onClick={createHome} openType="getUserInfo">创建游戏</AtButton>
     </View>
   )
 }
